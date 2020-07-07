@@ -16,10 +16,11 @@ module.exports = {
 
   async getAllEvents(req, res){
     const { sport } = req.params;
-    const query = { sport } || {}
+    const query = sport ? { sport } : {}
       try {        
         const events = await Event.find(query)
-          if (events){
+          
+        if (events){
             return res.json(events)
           }       
       } catch (error) {
