@@ -2,7 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
 module.exports = {
-  async store(req, res){
+  async createUser(req, res){
     try {      
       const { firstName, lastName, password, email } = req.body;
 
@@ -27,7 +27,22 @@ module.exports = {
 
 
     } catch (error) {
-      throw Error(`Erro durante o registro do novo usuário: ${error}`)
+      throw Error(`Erro ao registrar do novo usuário: ${error}`)
     }
+  },
+
+  async getUserById(req, res){
+    const { userId } = req.params;
+      try {
+        const user = await User.findById(userId);
+          if (user){
+            return res.json(user)
+          }
+      } catch (error) {
+          return res.status(400).json({
+            message:
+              'Id de Usuário não existe, deseja se registrar ao invés de logar?'
+          })
+      }
   }
 }
