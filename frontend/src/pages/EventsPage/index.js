@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import api from '../../services/api';
-import { Button, Form, FormGroup, Input, Container, Label, Alert } from 'reactstrap';
+import { Button, Form, FormGroup, Input, Container, Label, Alert, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import cameraIcon from '../../assets/camera.png';
 import "./events.css";
 
@@ -12,8 +12,11 @@ export default function EventsPage({ history }) {
   const [thumbnail, setThumbnail] = useState(null);
   const [sport, setSport] = useState('');
   const [date, setDate] = useState('');
-  const [error, setError] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [dropdowOpen, setOpen] = useState(false);
+
+  const toggle = () => setOpen(!dropdowOpen);
 
 
   const preview = useMemo(() => {
@@ -74,6 +77,16 @@ export default function EventsPage({ history }) {
             </FormGroup>
             <FormGroup>
               <Label>Evento: </Label>
+              <ButtonDropdown isOpen={dropdowOpen} toggle={toggle}>
+                <Button id="caret" color="primary">Eventos</Button>
+                <DropdownToggle caret color="primary" />
+                <DropdownMenu>
+                  <DropdownItem header>Eventos</DropdownItem>
+                  <DropdownItem>Esportes</DropdownItem>
+                  <DropdownItem>Social</DropdownItem>                  
+                  <DropdownItem>Religioso</DropdownItem>
+                </DropdownMenu>
+              </ButtonDropdown>
               <Input id="sport" type="text" value={sport} placeholder={'Nome do Evento'} onChange={(evt) => setSport(evt.target.value)} />
             </FormGroup>
             <FormGroup>

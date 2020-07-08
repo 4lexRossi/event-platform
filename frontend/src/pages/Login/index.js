@@ -28,7 +28,8 @@ export default function Login({ history }) {
         }, 2000)
       }
     } catch (error) {
-      
+        setError(true)
+        setErrorMessage("Erro na resposta do servidor")
     }
     
 
@@ -58,7 +59,7 @@ export default function Login({ history }) {
         </FormGroup>
       </Form>
       {error ? (
-        <Alert className="event-validation" color="danger">Está faltando dados obrigatórios</Alert>
+        <Alert className="event-validation" color="danger">{errorMessage}</Alert>
       ) : ""}
     </Container>
   );

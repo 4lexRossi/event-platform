@@ -1,53 +1,48 @@
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
+const User = require('../models/User')
 
 module.exports = {
-  async createUser(req, res){
-    try {      
-      const { firstName, lastName, password, email } = req.body;
+	async createUser(req, res) {
+		try {
+			const { email, firstName, lastName, password } = req.body
+			const existentUser = await User.findOne({ email })
 
-      const existentUser = await User.findOne({email});
-      if(!existentUser){
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-          firstName,
-          lastName,
-          email,
-          password: hashedPassword
- 
-        });
+			if (!existentUser) {
+				const hashPassword = await bcrypt.hash(password, 10)
+				const user = await User.create({
+					email,
+					firstName,
+					lastName,
+					password: hashPassword,
+				})
+				
+				return res.json({
+					_id: user._id,
+					email: user.email,
+					firstName: user.firstName,
+					lastName: user.lastName
+				})
+			}
+			return res.status(400).json({
+				message:
+					'email already exist!  do you want to login instead? ',
+			})
+		} catch (err) {
+			throw Error(`Error while Registering new user :  ${err}`)
+		}
+	},
 
-        return res.json({
-          _id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName
-        })
+	async getUserById(req, res) {
+		const { userId } = req.params;
 
-      }
-      
-      return res.status(400).json({
-        message: 'email já cadastrado ! Deseja logar ao invés de cadastrar?'
-      })
-
-
-    } catch (error) {
-      throw Error(`Erro ao registrar do novo usuário: ${error}`)
-    }
-  },
-
-  async getUserById(req, res){
-    const { userId } = req.params;
-      try {
-        const user = await User.findById(userId);
-          if (user){
-            return res.json(user)
-          }
-      } catch (error) {
-          return res.status(400).json({
-            message:
-              'Id de Usuário não existe, deseja se registrar ao invés de logar?'
-          })
-      }
-  }
+		try {
+			const user = await User.findById(userId);
+			return res.json(user)
+		} catch (error) {
+			return res.status(400).json({
+				message:
+					'User ID does not exist, do you want to register instead?',
+			})
+		}
+	}
 }
