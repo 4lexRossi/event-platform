@@ -10,7 +10,7 @@ export default function EventsPage({ history }) {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
-  const [sport, setSport] = useState('');
+  const [sport, setSport] = useState('Evento');
   const [date, setDate] = useState('');
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,7 +40,7 @@ export default function EventsPage({ history }) {
       if (title !== "" &&
         description !== "" &&
         price !== "" &&
-        sport !== "" &&
+        sport !== "Evento" &&
         date !== "" &&
         thumbnail !== null
       ) {
@@ -61,7 +61,7 @@ export default function EventsPage({ history }) {
     }
   }
 
-
+  const sportEventHandler = (sport) => setSport(sport)
 
   return (
     <Container>
@@ -74,21 +74,7 @@ export default function EventsPage({ history }) {
                 <Input id="thumbnail" type="file" onChange={(evt) => setThumbnail(evt.target.files[0])} />
                 <img src={cameraIcon} style={{ maxWidth: "50px" }} alt="icone de enviar arquivo" />
               </Label>
-            </FormGroup>
-            <FormGroup>
-              <Label>Evento: </Label>
-              <ButtonDropdown isOpen={dropdowOpen} toggle={toggle}>
-                <Button id="caret" color="primary">Eventos</Button>
-                <DropdownToggle caret color="primary" />
-                <DropdownMenu>
-                  <DropdownItem header>Eventos</DropdownItem>
-                  <DropdownItem>Esportes</DropdownItem>
-                  <DropdownItem>Social</DropdownItem>                  
-                  <DropdownItem>Religioso</DropdownItem>
-                </DropdownMenu>
-              </ButtonDropdown>
-              <Input id="sport" type="text" value={sport} placeholder={'Nome do Evento'} onChange={(evt) => setSport(evt.target.value)} />
-            </FormGroup>
+            </FormGroup>            
             <FormGroup>
               <Label>Nome do evento: </Label>
               <Input id="title" type="text" value={title} placeholder={'Nome do Evento'} onChange={(evt) => setTitle(evt.target.value)} />
@@ -105,13 +91,24 @@ export default function EventsPage({ history }) {
               <Label>Data do evento: </Label>
               <Input id="date" type="date" value={date} placeholder={'00/00/0000'} onChange={(evt) => setDate(evt.target.value)} />
             </FormGroup>
+            <FormGroup>              
+              <ButtonDropdown isOpen={dropdowOpen} toggle={toggle}>
+                <Button id="caret" value={sport} disabled>{sport}</Button>
+                <DropdownToggle caret />
+                <DropdownMenu>                  
+                  <DropdownItem onClick={() => sportEventHandler('Esportes')}>Esportes</DropdownItem>
+                  <DropdownItem onClick={() => sportEventHandler('Social')}>Social</DropdownItem>                  
+                  <DropdownItem onClick={() => sportEventHandler('Religioso')}>Religioso</DropdownItem>
+                </DropdownMenu>
+              </ButtonDropdown>
+            </FormGroup>
         </div>
         <FormGroup>
           <Button type="submit" className="submit-btn">
             Criar Evento</Button>
         </FormGroup>
         <FormGroup>
-          <Button className="secondary-btn" onClick={() => history.push("/dashboard")}>
+          <Button className="secondary-btn" onClick={() => history.push("/")}>
             Listar Eventos</Button>
         </FormGroup>
       </Form>
