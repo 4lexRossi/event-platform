@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import api from '../../services/api';
 import { Button, Form, FormGroup, Input, Container, Label, Alert, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import cameraIcon from '../../assets/camera.png';
 import "./events.css";
 
 export default function EventsPage({ history }) {
-
+  
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -15,17 +15,21 @@ export default function EventsPage({ history }) {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [dropdowOpen, setOpen] = useState(false);
+  const user = localStorage.getItem('user');
 
+  useEffect(() =>{
+    if(!user) history.push('/login');
+  },[])
+  
   const toggle = () => setOpen(!dropdowOpen);
-
-
+  
+  
   const preview = useMemo(() => {
     return thumbnail ? URL.createObjectURL(thumbnail) : null;
   }, [thumbnail])
 
   const submitHandler = async (evt) => {
     evt.preventDefault()
-    const user_id = localStorage.getItem('user');
 
     const eventData = new FormData();
 
@@ -44,7 +48,7 @@ export default function EventsPage({ history }) {
         date !== "" &&
         thumbnail !== null
       ) {
-        await api.post("/event", eventData, { headers: { user_id } })
+        await api.post("/event", eventData, { headers: { user } })
         setSuccess(true)
         setTimeout(() => {
           setSuccess(false)
