@@ -22,7 +22,7 @@ export default function Register({ history }) {
       if (user && user_id) {
         localStorage.setItem('user', user)
         localStorage.setItem('user_id', user_id)
-        history.push('/dashboard')
+        history.push('/')
       } else {
         const { message } = response.data
           setError(true)  

@@ -37,6 +37,18 @@ ul.event-list header buton {
   flex-direction: row-reverse;
 }
 
+ul.notifications li {
+  list-style: none;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+ul.notifications li {
+  font-size: 16px;
+  line-height: 24px;
+}
+
 @media (max-width:768px){
   ul.events-list {
     grid-template-columns: 1fr;

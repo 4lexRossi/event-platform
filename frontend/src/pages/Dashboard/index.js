@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import api from '../../services/api';
 import moment from 'moment';
 import { Button, ButtonGroup, Alert } from 'reactstrap';
@@ -16,15 +16,20 @@ export default function Dashboard({history}) {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [messageHandler, setMessageHandler] = useState('');
+  const [eventRequests, setEventsRequests] = useState([])
+
   useEffect(() => {
     getEvents()
   }, [])
+  
+  const socket = useMemo(() =>
+    socketio('http://localhost:8000/', { query: { user: user_id }})
+    [user_id]
+  );
 
   useEffect(() =>{
-    const socket = socketio('http://localhost:8000/', { query: { user }})
-
-    socket.on('registration_request', data => console.log(data))
-  }, [])
+    socket.on('registration_request', data => (setEventsRequests([...eventRequests, data])))
+  }, [eventRequests, socket])
 
   const filterHandler = (query) => {
     setRSelected(query)
@@ -104,7 +109,24 @@ export default function Dashboard({history}) {
   }
 
   return (
-    <>      
+    <>
+      <ul className="notifications">
+        {eventRequests.map(request =>{
+          return(
+            <li key={request._id}>
+              <div>
+                <strong>{request.user.email}</strong> está pedindo para se registrar em seu evento
+                <strong>{request.event.title}</strong>
+              </div>
+                <ButtonGroup>
+                 <Button color="primary" onClick={() => {}}>Aceitar</Button>
+                  <Button color="danger" onClick={() => {}}>Declinar</Button>
+                </ButtonGroup>              
+            </li>
+          )
+        })}
+      
+      </ul>      
       <div className="filter-panel">
         <ButtonGroup>
           <Button color="primary" onClick={() => filterHandler(null)} active={rSelected === null}>Todos Eventos</Button>
