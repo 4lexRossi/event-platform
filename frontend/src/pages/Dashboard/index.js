@@ -6,7 +6,7 @@ import socketio from 'socket.io-client';
 
 import './dashboard.css'
 
-export default function Dashboard({history}) {
+export default function Dashboard({ history }) {
   const [events, setEvents] = useState([]);
   const user = localStorage.getItem('user');
   const user_id = localStorage.getItem('user_id');
@@ -16,20 +16,23 @@ export default function Dashboard({history}) {
   const [messageHandler, setMessageHandler] = useState('');
   const [eventRequests, setEventsRequests] = useState([]);
   const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [eventRequestMessage, setEventRequestMessage] = useState('')
+  const [eventRequestSuccess, setEventRequestSuccess] = useState(false)
+
 
   const toggle = () => setDropDownOpen(!dropDownOpen)
 
   useEffect(() => {
     getEvents()
   }, [])
-  
+
   const socket = useMemo(
     () =>
-      socketio('http://localhost:8000/', { query: { user: user_id }}),
+      socketio('http://localhost:8000/', { query: { user: user_id } }),
     [user_id]
   );
 
-  useEffect(() =>{
+  useEffect(() => {
     socket.on('registration_request', data => (setEventsRequests([...eventRequests, data])))
   }, [eventRequests, socket])
 
@@ -41,10 +44,10 @@ export default function Dashboard({history}) {
   const myEventsHandler = async () => {
     try {
       setRSelected('myevents')
-      const response = await api.get('/user/events', { headers: { user: user }})
-      setEvents(response.data.events)      
+      const response = await api.get('/user/events', { headers: { user: user } })
+      setEvents(response.data.events)
     } catch (error) {
-      history.push('/login');      
+      history.push('/login');
     }
   }
 
@@ -52,15 +55,15 @@ export default function Dashboard({history}) {
     try {
       const url = filter ? `/dashboard/${filter}` : '/dashboard'
       const response = await api.get(url, { headers: { user: user } })
-  
+
       setEvents(response.data.events)
-      
+
     } catch (error) {
       history.push('/login');
-      
+
     }
   };
-  const deleteEventHandler = async(eventId) => {
+  const deleteEventHandler = async (eventId) => {
     try {
       await api.delete(`/event/${eventId}`, { headers: { user: user } });
       setSuccess(true)
@@ -70,7 +73,7 @@ export default function Dashboard({history}) {
         filterHandler(null)
         setMessageHandler('')
       }, 2500)
-      
+
     } catch (error) {
       setError(true)
       setMessageHandler('Erro ao excluir evento')
@@ -78,24 +81,24 @@ export default function Dashboard({history}) {
         setError(false)
         setMessageHandler('')
       }, 2000)
-      
+
     }
   }
 
-  
 
-  const registrationRequestHandler = async (event) =>{
+
+  const registrationRequestHandler = async (event) => {
     try {
-      await api.post(`/registration/${event.id}`, {}, { headers: { user }})
+      await api.post(`/registration/${event.id}`, {}, { headers: { user } })
 
       setSuccess(true)
-        setMessageHandler(`Inscrito no evento ${event.title} com sucesso!`)
-        setTimeout(() => {
-          setSuccess(false)
-          filterHandler(null)
-          setMessageHandler('')
-        }, 2500)
-      
+      setMessageHandler(`Inscrito no evento ${event.title} com sucesso!`)
+      setTimeout(() => {
+        setSuccess(false)
+        filterHandler(null)
+        setMessageHandler('')
+      }, 2500)
+
     } catch (error) {
       setError(true)
       setMessageHandler(`Inscrição no evento ${event.title} não foi bem sucedida`)
@@ -105,25 +108,63 @@ export default function Dashboard({history}) {
       }, 2000)
     }
   }
+  const acceptEventHandler = async (eventId) => {
+    try {
+      await api.post(`/registration/${eventId}/approvals`, {}, { headers: { user } })
+
+      setEventRequestSuccess(true)
+      setEventRequestMessage('Inscrição no evento aprovada com sucesso!')
+      removeNotificationFromDashboard(eventId)
+      setTimeout(() => {
+        setEventRequestSuccess(false)
+        setEventRequestMessage('')
+      }, 2000)
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  const rejectEventHandler = async (eventId) => {
+    try {
+      await api.post(`/registration/${eventId}/rejections`, {}, { headers: { user } })
+
+      setEventRequestSuccess(true)
+      setEventRequestMessage('Pedido de inscrição no evento rejeitado com sucesso!')
+      removeNotificationFromDashboard(eventId)
+      setTimeout(() => {
+        setEventRequestSuccess(false)
+        setEventRequestMessage('')
+      }, 2500)
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const removeNotificationFromDashboard = (eventId) => {
+    const newEvents = eventRequests.filter ((event) => event._id !== eventId)
+    setEventsRequests(newEvents);
+  }
 
   return (
     <>
       <ul className="notifications">
-        {eventRequests.map(request =>{
-          return(
+        {eventRequests.map(request => {
+          return (
             <li key={request._id}>
               <div>
                 <strong>{request.user.email}</strong> está pedindo para se registrar em seu evento
                 <strong>{request.event.title}</strong>
               </div>
-                <ButtonGroup>
-                 <Button color="primary" onClick={() => {}}>Aceitar</Button>
-                  <Button color="danger" onClick={() => {}}>Declinar</Button>
-                </ButtonGroup>              
+              <ButtonGroup>
+                <Button color="primary" onClick={() => acceptEventHandler(request._id)}>Aceitar</Button>
+                <Button color="danger" onClick={() => rejectEventHandler(request._id)}>Declinar</Button>
+              </ButtonGroup>
             </li>
           )
-        })}      
-      </ul>      
+        })}
+      </ul>
+      {eventRequestSuccess ?<Alert color="success">{eventRequestMessage}</Alert> : ""}
       <div className="filter-panel">
         <Dropdown isOpen={dropDownOpen} toggle={toggle}>
           <DropdownToggle color="primary" caret>
@@ -136,7 +177,7 @@ export default function Dashboard({history}) {
             <DropdownItem onClick={() => filterHandler('Social')} active={rSelected === 'Social'}>Social</DropdownItem>
             <DropdownItem onClick={() => filterHandler('Religioso')} active={rSelected === 'Religioso'}>Religioso</DropdownItem>
           </DropdownMenu>
-        </Dropdown>   
+        </Dropdown>
       </div>
       <ul className="events-list">
         {events.map(event => (
@@ -152,12 +193,12 @@ export default function Dashboard({history}) {
           </li>
         ))}
       </ul>
-        {error ? (
-          <Alert className="event-validation" color="danger">{messageHandler}</Alert>
-        ) : ""}
-        {success ? (
-          <Alert className="event-validation" color="success">{messageHandler}</Alert>
-        ) : ""}
+      {error ? (
+        <Alert className="event-validation" color="danger">{messageHandler}</Alert>
+      ) : ""}
+      {success ? (
+        <Alert className="event-validation" color="success">{messageHandler}</Alert>
+      ) : ""}
     </>
   )
 }

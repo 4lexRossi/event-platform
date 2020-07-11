@@ -32,16 +32,15 @@ div.filter-panel{
   margin-bottom: 50px;
 }
 
-ul.event-list header buton {
+ul.event-list header div {
   display: flex;
   flex-direction: row-reverse;
 }
 
-ul.notifications li {
+ul.notifications {
   list-style: none;
   margin-bottom: 16px;
-  display: flex;
-  flex-direction: row-reverse;
+  
 }
 
 ul.notifications li {
