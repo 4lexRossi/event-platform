@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import api from '../../services/api';
 import moment from 'moment';
-import { Button, ButtonGroup, Alert } from 'reactstrap';
+import { Button, ButtonGroup, Alert, Dropdown, DropdownItem, DropdownToggle, DropdownMenu } from 'reactstrap';
 import socketio from 'socket.io-client';
 
 import './dashboard.css'
-import { use } from '../../../../backend/src/routes';
-import Registration from '../../../../backend/src/models/Registration';
 
 export default function Dashboard({history}) {
   const [events, setEvents] = useState([]);
@@ -16,14 +14,18 @@ export default function Dashboard({history}) {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [messageHandler, setMessageHandler] = useState('');
-  const [eventRequests, setEventsRequests] = useState([])
+  const [eventRequests, setEventsRequests] = useState([]);
+  const [dropDownOpen, setDropDownOpen] = useState(false);
+
+  const toggle = () => setDropDownOpen(!dropDownOpen)
 
   useEffect(() => {
     getEvents()
   }, [])
   
-  const socket = useMemo(() =>
-    socketio('http://localhost:8000/', { query: { user: user_id }})
+  const socket = useMemo(
+    () =>
+      socketio('http://localhost:8000/', { query: { user: user_id }}),
     [user_id]
   );
 
@@ -80,11 +82,7 @@ export default function Dashboard({history}) {
     }
   }
 
-  const logoutHandler = () =>{
-    localStorage.removeItem('user')
-    localStorage.removeItem('user_id')
-    history.push('/login');
-  }
+  
 
   const registrationRequestHandler = async (event) =>{
     try {
@@ -124,21 +122,21 @@ export default function Dashboard({history}) {
                 </ButtonGroup>              
             </li>
           )
-        })}
-      
+        })}      
       </ul>      
       <div className="filter-panel">
-        <ButtonGroup>
-          <Button color="primary" onClick={() => filterHandler(null)} active={rSelected === null}>Todos Eventos</Button>
-          <Button color="primary" onClick={myEventsHandler} active={rSelected === 'myevents'}>Meus Eventos</Button>
-          <Button color="primary" onClick={() => filterHandler('Esportes')} active={rSelected === 'Esportes'}>Esportes</Button>
-          <Button color="primary" onClick={() => filterHandler('Social')} active={rSelected === 'Social'}>Social</Button>
-          <Button color="primary" onClick={() => filterHandler('Religioso')} active={rSelected === 'Religioso'}>Religioso</Button>
-        </ButtonGroup>
-        <ButtonGroup>
-          <Button color="secondary" onClick={() => history.push('events')}>Eventos</Button>
-          <Button color="danger" onClick={logoutHandler}>logout</Button>
-        </ButtonGroup>
+        <Dropdown isOpen={dropDownOpen} toggle={toggle}>
+          <DropdownToggle color="primary" caret>
+            filter
+          </DropdownToggle>
+          <DropdownMenu>
+            <DropdownItem onClick={() => filterHandler(null)} active={rSelected === null}>Todos os Eventos</DropdownItem>
+            <DropdownItem onClick={myEventsHandler} active={rSelected === 'myevents'}>Meus Eventos</DropdownItem>
+            <DropdownItem onClick={() => filterHandler('Esportes')} active={rSelected === 'Esportes'}>Esportes</DropdownItem>
+            <DropdownItem onClick={() => filterHandler('Social')} active={rSelected === 'Social'}>Social</DropdownItem>
+            <DropdownItem onClick={() => filterHandler('Religioso')} active={rSelected === 'Religioso'}>Religioso</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>   
       </div>
       <ul className="events-list">
         {events.map(event => (

@@ -18,7 +18,7 @@ export default function EventsPage({ history }) {
   const user = localStorage.getItem('user');
 
   useEffect(() =>{
-    if(!user) history.push('/login');
+    if(!user) history.push('/login')
   },[])
   
   const toggle = () => setOpen(!dropdowOpen);

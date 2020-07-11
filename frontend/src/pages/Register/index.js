@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import api from '../../services/api';
 import { Button, Form, FormGroup, Input, Container, Alert } from 'reactstrap';
+import { UserContext } from '../../user-context';
 
 export default function Register({ history }) {
+  const { setIsLoggedIn } = useContext(UserContext);  
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [firstName, setFirstName] = useState("")
@@ -22,6 +24,7 @@ export default function Register({ history }) {
       if (user && user_id) {
         localStorage.setItem('user', user)
         localStorage.setItem('user_id', user_id)
+        setIsLoggedIn(true)
         history.push('/')
       } else {
         const { message } = response.data
