@@ -26,6 +26,9 @@ const TopNav = () => {
               <Link to="/events">Registro eventos</Link>
             </NavItem>
             <NavItem>
+              <Link to="/myregistrations">Meus registros</Link>
+            </NavItem>
+            <NavItem>
               <Link to="/">Lista Eventos</Link>
             </NavItem>
           </Nav>
