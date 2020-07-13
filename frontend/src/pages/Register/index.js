@@ -70,9 +70,9 @@ export default function Register({ history }) {
           </FormGroup>
         </div>
         <FormGroup>
-          <Button className="submit-btn">Cadastrar</Button>
+          <Button className="submit-btn" color="info">Cadastrar</Button>
         </FormGroup>
-        <FormGroup>
+        <FormGroup> 
           <Button className="secondary-btn" onClick={() => history.push("/login")}>Deseja logar?</Button>
         </FormGroup>
       </Form>

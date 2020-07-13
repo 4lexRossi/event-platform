@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment'
-import { Button, ButtonGroup, Alert} from 'reactstrap';
+import { Button, ButtonGroup } from 'reactstrap';
 import './myRegistration.css'
 
 import api from '../../services/api';
@@ -20,7 +20,7 @@ export default function MyRegistrations() {
       const response = await api.get('/registration', {headers: { user }})
       setMyEvents(response.data)
     } catch (error) {
-      
+       
     }
 
   }
@@ -53,7 +53,7 @@ export default function MyRegistrations() {
           <div><strong>{event.eventTitle}</strong></div>
           <div className="events-details">
             <span>Event Date: {moment(event.eventDate).format('dd/mm/YYYY')}</span>
-            <span>Event Price: {parseFloat(event.eventPrice).toFixed(2)}</span>
+            <span>Event Price R$:{parseFloat(event.eventPrice).toFixed(2)}</span>
             <span>User Email: {event.userEmail}</span>
             <span>Status: 
               <span className={event.approved !== undefined ? isApproved(event.approved): "Pendente"}>{event.approved !== undefined ? isApproved(event.approved): "Pendente"}</span>
